@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Electroquímica - Prototipo</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: var(--bg); color: var(--text); line-height: 1.5; }
+    header { background: var(--primary); color: white; padding: 1.2rem 1rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    header h1 { font-size: 1.6rem; margin-bottom: 0.2rem; }
+    header p { font-size: 0.95rem; opacity: 0.9; }
+    nav { display: flex; gap: 0.5rem; padding: 1rem; flex-wrap: wrap; justify-content: center; background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+    nav button { padding: 0.6rem 1rem; border: 1px solid var(--border); background: white; border-radius: 20px; cursor: pointer; transition: 0.2s; font-weight: 500; }
+    nav button:hover, nav button.active { background: var(--primary); color: white; border-color: var(--primary); }
+    main { max-width: 900px; margin: 1.5rem auto; padding: 0 1rem; }
+    section { display: none; animation: fadeIn 0.3s ease; }
+    section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .card { background: var(--card); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+    h2 { color: var(--primary-dark); margin-bottom: 1rem; font-size: 1.3rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.95rem; }
+    input, select { width: 100%; padding: 0.7rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
+    input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    button.calc { background: var(--primary); color: white; border: none; padding: 0.8rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 500; width: 100%; margin-top: 0.5rem; }
+    button.calc:hover { background: var(--primary-dark); }
+    .step-box { background: #f1f5f9; padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 4px solid var(--primary); }
+    .step-box p { margin: 0.5rem 0; }
+    .highlight { background: #fef3c7; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+    .success { color: var(--success); font-weight: 600; }
+    .error { color: var(--danger); font-weight: 600; }
+    .quiz-option { display: block; width: 100%; padding: 0.8rem; margin: 0.5rem 0; border: 1px solid var(--border); border-radius: 8px; background: white; text-align: left; cursor: pointer; transition: 0.2s; }
+    .quiz-option:hover { background: #f8fafc; }
+    .quiz-option.selected { border-color: var(--primary); background: #eff6ff; }
+    .quiz-option.correct { border-color: var(--success); background: #ecfdf5; }
+    .quiz-option.incorrect { border-color: var(--danger); background: #fef2f2; }
+    .feedback { margin-top: 0.8rem; padding: 0.8rem; border-radius: 8px; display: none; }
+    .tip-box { background: #fffbeb; border: 1px solid #f59e0b; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+    .tip-box h3 { color: #b45309; margin-bottom: 0.5rem; }
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+    footer { text-align: center; padding: 2rem 1rem; color: var(--text-light); font-size: 0.9rem; border-top: 1px solid var(--border); margin-top: 2rem; }
+    @media (max-width: 600px) { nav { gap: 0.3rem; } nav button { font-size: 0.85rem; padding: 0.5rem 0.8rem; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ Portal Electroquímica</h1>
+  <p>Herramientas interactivas para balanceo REDOX, potenciales de celda y electrólisis</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('potencial')">🔋 Potencial E°celda</button>
+  <button onclick="showSection('faraday')">🧪 Ley de Faraday</button>
+  <button onclick="showSection('redox')">🔄 Balanceo REDOX</button>
+  <button onclick="showSection('quiz')">📝 Quiz Interactivo</button>
+  <button onclick="showSection('tips')">💡 Desconfusiones</button>
+</nav>
+
+<main>
+  <!-- SECCIÓN 1: POTENCIAL DE CELDA -->
+  <section id="potencial" class="active">
+    <div class="card">
+      <h2>🔋 Calculadora de Potencial Estándar (E°celda)</h2>
+      <p>Ingresa los potenciales de reducción estándar tabulados. El sistema identificará ánodo/cátodo y calculará espontaneidad.</p>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>E°₁ (Reducción) en V</label>
+          <input type="number" id="e1" step="0.001" placeholder="Ej: 0.340 (Cu²⁺/Cu)">
+        </div>
+        <div class="form-group">
+          <label>E°₂ (Reducción) en V</label>
+          <input type="number" id="e2" step="0.001" placeholder="Ej: -0.760 (Zn²⁺/Zn)">
+        </div>
+      </div>
+      <button class="calc" onclick="calcEcell()">Calcular E°celda y Espontaneidad</button>
+      <div id="result-potencial" class="step-box" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 2: LEY DE FARADAY -->
+  <section id="faraday">
+    <div class="card">
+      <h2>🧪 Calculadora de Electrólisis (Ley de Faraday)</h2>
+      <p>Fórmula: <span class="highlight">m = (I × t × M) / (n × F)</span> &nbsp;|&nbsp; F = 96485 C/mol</p>
+      <div class="form-group">
+        <label>¿Qué deseas calcular?</label>
+        <select id="faraday-target">
+          <option value="m">Masa depositada (g)</option>
+          <option value="I">Corriente (A)</option>
+          <option value="t">Tiempo (s)</option>
+        </select>
+      </div>
+      <div class="grid-2">
+        <div class="form-group"><label>Corriente I (A)</label><input type="number" id="f_I" step="0.01"></div>
+        <div class="form-group"><label>Tiempo t (s)</label><input type="number" id="f_t" step="1"></div>
+        <div class="form-group"><label>Masa molar M (g/mol)</label><input type="number" id="f_M" step="0.01"></div>
+        <div class="form-group"><label>Electrones transferidos (n)</label><input type="number" id="f_n" step="1" min="1"></div>
+      </div>
+      <button class="calc" onclick="calcFaraday()">Calcular</button>
+      <div id="result-faraday" class="step-box" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 3: BALANCEO REDOX GUIADO -->
+  <section id="redox">
+    <div class="card">
+      <h2>🔄 Guía Interactiva: Balanceo Ion-Electrón</h2>
+      <p>Selecciona el medio y practica el procedimiento paso a paso usando el ejemplo de tus diapositivas.</p>
+      <div class="form-group">
+        <label>Medio de reacción</label>
+        <select id="redox-medium" onchange="loadRedoxExample()">
+          <option value="acid">Ácido (H⁺ disponible)</option>
+          <option value="basic">Básico (OH⁻ disponible)</option>
+        </select>
+      </div>
+      <div id="redox-steps" class="step-box">
+        <p><strong>Paso 1:</strong> Separar semirreacciones.</p>
+        <p id="redox-half1">Reducción: Cr₂O₇²⁻ → Cr³⁺</p>
+        <p id="redox-half2">Oxidación: Fe²⁺ → Fe³⁺</p>
+        <hr style="margin:0.8rem 0; border:none; border-top:1px dashed #cbd5e1;">
+        <p><strong>Paso 2:</strong> Balancear átomos (≠ O, H) → Balancear O con H₂O → Balancear H con H⁺/OH⁻ → Balancear carga con e⁻.</p>
+        <p id="redox-balanced1" class="highlight" style="margin-top:0.5rem;"></p>
+        <p id="redox-balanced2" class="highlight" style="margin-top:0.5rem;"></p>
+        <button class="calc" style="margin-top:1rem;" onclick="showRedoxFinal()">Mostrar ecuación global balanceada</button>
+        <p id="redox-final" style="margin-top:1rem; font-weight:500;"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 4: QUIZ -->
+  <section id="quiz">
+    <div class="card">
+      <h2>📝 Quiz Rápido (5 preguntas)</h2>
+      <p id="quiz-progress">Pregunta 1 de 5</p>
+      <div id="quiz-container">
+        <p id="quiz-question" style="font-size:1.1rem; margin:1rem 0; font-weight:500;"></p>
+        <div id="quiz-options"></div>
+        <div id="quiz-feedback" class="feedback"></div>
+        <button id="quiz-next" class="calc" style="display:none; margin-top:1rem;" onclick="nextQuestion()">Siguiente →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECCIÓN 5: DESCONFUSIONES -->
+  <section id="tips">
+    <div class="card">
+      <h2>💡 Centro de "Desconfusiones"</h2>
+      <div class="tip-box">
+        <h3>🔍 Ánodo vs Cátodo</h3>
+        <p>• <strong>Ánodo:</strong> SIEMPRE ocurre <span class="highlight">OXIDACIÓN</span>. Signo: <span class="error">(-) en Galvánica</span>, <span class="success">(+)</span> en Electrolítica.</p>
+        <p>• <strong>Cátodo:</strong> SIEMPRE ocurre <span class="highlight">REDUCCIÓN</span>. Signo: <span class="success">(+)</span> en Galvánica, <span class="error">(-)</span> en Electrolítica.</p>
+        <p>💡 Mnemotecnia: <code>AN OX</code> | <code>RED CAT</code></p>
+      </div>
+      <div class="tip-box">
+        <h3>⚡ Potenciales y Coeficientes</h3>
+        <p>El potencial estándar <span class="highlight">NO se multiplica</span> por los coeficientes estequiométricos al balancear electrones. Es una propiedad intensiva.</p>
+      </div>
+      <div class="tip-box">
+        <h3>🌉 Puente Salino</h3>
+        <p>Aniones migran al <strong>ánodo</strong> (compensa carga + por oxidación). Cationes migran al <strong>cátodo</strong> (compensa carga - por reducción).</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>Prototipo académico | Basado en Clase 12A & 12B Electroquímica 2025-II</p>
+  <p>Para uso docente y estudiantil. Código abierto para personalización.</p>
+</footer>
+
+<script>
+  // NAVEGACIÓN
+  function showSection(id) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  // 1. CALCULADORA E° CELDA
+  function calcEcell() {
+    const e1 = parseFloat(document.getElementById('e1').value);
+    const e2 = parseFloat(document.getElementById('e2').value);
+    if (isNaN(e1) || isNaN(e2)) return alert('Ingresa ambos valores de E°');
+    
+    const cat = e1 >= e2 ? e1 : e2;
+    const an = e1 >= e2 ? e2 : e1;
+    const ecathode = e1 >= e2 ? 'E°₁' : 'E°₂';
+    const eanode = e1 >= e2 ? 'E°₂' : 'E°₁';
+    const ecell = (cat - an).toFixed(3);
+    const spont = ecell > 0 ? 'ESPONTÁNEA' : 'NO ESPONTÁNEA';
+    const color = ecell > 0 ? 'success' : 'error';
+    
+    const html = `
+      <p>✅ <strong>Cátodo (Reducción):</strong> ${ecathode} = ${cat.toFixed(3)} V (Mayor E°)</p>
+      <p>🔋 <strong>Ánodo (Oxidación):</strong> ${eanode} = ${an.toFixed(3)} V (Menor E°)</p>
+      <p>📐 <strong>E°celda = E°cátodo - E°ánodo = ${cat.toFixed(3)} - ${an.toFixed(3)} = <span class="${color}">${ecell} V</span></p>
+      <p>🎯 <strong>Conclusión:</strong> La reacción es <span class="${color}">${spont}</span></p>
+      <p style="margin-top:0.5rem; font-size:0.9rem; color:#64748b;">⚠️ Recuerda: Los potenciales <strong>no</strong> se multiplican por los coeficientes al balancear electrones.</p>
+    `;
+    const res = document.getElementById('result-potencial');
+    res.innerHTML = html;
+    res.style.display = 'block';
+  }
+
+  // 2. CALCULADORA FARADAY
+  function calcFaraday() {
+    const target = document.getElementById('faraday-target').value;
+    let I = parseFloat(document.getElementById('f_I').value);
+    let t = parseFloat(document.getElementById('f_t').value);
+    let M = parseFloat(document.getElementById('f_M').value);
+    let n = parseFloat(document.getElementById('f_n').value);
+    const F = 96485;
+    
+    if ([I,t,M,n].some(v => isNaN(v) || v===0)) return alert('Completa todos los campos (usa 0 solo para la incógnita si el selector lo permite, pero aquí ingresa todos y selecciona qué calcular)');
+    // Ajuste: el usuario ingresa 3, calcula 1. Simplificamos: ingresa todo, el sistema calcula según selector
+    if(target==='m') { I = I || 0; t = t || 0; M = M || 0; n = n || 0; if(!I||!t||!M||!n) return alert('Ingresa valores para I, t, M, n'); }
+    // Para el prototipo, asumimos que ingresa los 3 necesarios y el cuarto lo dejamos en blanco o usamos lógica simple
+    // Mejor: recalculo dinámico según target
+    let val = 0, formula = '', step = '';
+    if(target==='m') { if(!I||!t||!M||!n) return alert('Ingresa I, t, M, n'); val = (I*t*M)/(n*F); formula = `m = (I×t×M)/(n×F) = (${I}×${t}×${M})/(${n}×${F})`; }
+    else if(target==='I') { if(!t||!M||!n) return alert('Ingresa m, t, M, n'); const m = prompt('Masa (g)?'); if(!m) return; val = (m*n*F)/(t*M); formula = `I = (m×n×F)/(t×M)`; }
+    else if(target==='t') { if(!I||!M||!n) return alert('Ingresa m, I, M, n'); const m = prompt('Masa (g)?'); if(!m) return; val = (m*n*F)/(I*M); formula = `t = (m×n×F)/(I×M)`; }
+    
+    const html = `
+      <p>📐 <strong>Fórmula aplicada:</strong> ${formula}</p>
+      <p>🔢 <strong>Cálculo:</strong> <span class="highlight">${val.toFixed(4)} ${target==='m'?'g':target==='I'?'A':'s'}</span></p>
+      <p style="margin-top:0.5rem; font-size:0.9rem;">💡 Conversión: 1 F = 96485 C | 1 A = 1 C/s</p>
+    `;
+    const res = document.getElementById('result-faraday');
+    res.innerHTML = html;
+    res.style.display = 'block';
+  }
+
+  // 3. BALANCEO REDOX GUIADO
+  function loadRedoxExample() {
+    const medium = document.getElementById('redox-medium').value;
+    document.getElementById('redox-final').textContent = '';
+    if(medium === 'acid') {
+      document.getElementById('redox-half1').textContent = 'Reducción: Cr₂O₇²⁻ → Cr³⁺';
+      document.getElementById('redox-half2').textContent = 'Oxidación: Fe²⁺ → Fe³⁺';
+      document.getElementById('redox-balanced1').textContent = '14 H⁺ + Cr₂O₇²⁻ + 6 e⁻ → 2 Cr³⁺ + 7 H₂O';
+      document.getElementById('redox-balanced2').textContent = 'Fe²⁺ → Fe³⁺ + 1 e⁻';
+    } else {
+      document.getElementById('redox-half1').textContent = 'Reducción: MnO₄⁻ → MnO₂';
+      document.getElementById('redox-half2').textContent = 'Oxidación: CN⁻ → OCN⁻';
+      document.getElementById('redox-balanced1').textContent = '4 H⁺ + MnO₄⁻ + 3 e⁻ → MnO₂ + 2 H₂O';
+      document.getElementById('redox-balanced2').textContent = 'H₂O + CN⁻ → OCN⁻ + 2 H⁺ + 2 e⁻';
+    }
+  }
+  function showRedoxFinal() {
+    const medium = document.getElementById('redox-medium').value;
+    const el = document.getElementById('redox-final');
+    if(medium === 'acid') {
+      el.innerHTML = '🔍 <strong>Ecuación global (Ácido):</strong><br>14 H⁺ + Cr₂O₇²⁻ + 6 Fe²⁺ → 2 Cr³⁺ + 6 Fe³⁺ + 7 H₂O<br><span style="font-size:0.9rem; color:#64748b;">Se multiplicó la oxidación ×6 para igualar 6 e⁻.</span>';
+    } else {
+      el.innerHTML = '🔍 <strong>Ecuación global (Básico):</strong><br>H₂O + 2 MnO₄⁻ + 3 CN⁻ → 2 MnO₂ + 3 OCN⁻ + 2 OH⁻<br><span style="font-size:0.9rem; color:#64748b;">Se sumaron OH⁻ a ambos lados para neutralizar H⁺ y se simplificó H₂O.</span>';
+    }
+  }
+
+  // 4. QUIZ ENGINE
+  const quizData = [
+    { q: "En una celda electrolítica, el ánodo tiene signo ______ y allí ocurre ______.", opts: ["Positivo / Oxidación", "Negativo / Reducción", "Positivo / Reducción", "Negativo / Oxidación"], correct: 0, feedback: "✅ Correcto. En electrolítica el ánodo es (+) conectado al polo positivo de la fuente, y siempre ocurre OXIDACIÓN." },
+    { q: "¿Qué iones del puente salino migran hacia el cátodo?", opts: ["Aniones (−)", "Cationes (+)", "Electrones (e⁻)", "Moléculas de agua"], correct: 1, feedback: "✅ Correcto. Los cationes migran al cátodo para compensar la carga negativa generada por la reducción." },
+    { q: "Si E°celda = −0.45 V, la reacción es:", opts: ["Espontánea", "No espontánea", "En equilibrio", "Exotérmica siempre"], correct: 1, feedback: "✅ Correcto. E° < 0 indica que la reacción directa no es espontánea. Se requiere energía externa (electrólisis)." },
+    { q: "Al balancear REDOX en medio básico, después de usar H⁺ y H₂O, ¿qué se hace?", opts: ["Se dejan los H⁺ tal cual", "Se agregan OH⁻ a ambos lados para neutralizar H⁺", "Se multiplica todo por −1", "Se elimina el H₂O"], correct: 1, feedback: "✅ Correcto. Se añaden OH⁻ equivalentes a los H⁺, se forma H₂O y se simplifica." },
+    { q: "Para calcular E°celda, si se multiplica una semirreacción por 2 para balancear e⁻, el potencial E°:", opts: ["Se duplica", "Se mantiene igual", "Se eleva al cuadrado", "Se divide por 2"], correct: 1, feedback: "✅ Correcto. E° es una propiedad intensiva. No se multiplica por coeficientes estequiométricos." }
+  ];
+  let qIndex = 0;
+  function loadQuiz() {
+    const q = quizData[qIndex];
+    document.getElementById('quiz-progress').textContent = `Pregunta ${qIndex+1} de ${quizData.length}`;
+    document.getElementById('quiz-question').textContent = q.q;
+    const optsDiv = document.getElementById('quiz-options');
+    optsDiv.innerHTML = '';
+    q.opts.forEach((o, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      btn.textContent = o;
+      btn.onclick = () => checkQuiz(i, btn);
+      optsDiv.appendChild(btn);
+    });
+    document.getElementById('quiz-feedback').style.display = 'none';
+    document.getElementById('quiz-next').style.display = 'none';
+  }
+  function checkQuiz(i, btn) {
+    const q = quizData[qIndex];
+    document.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
+    if(i === q.correct) {
+      btn.classList.add('correct');
+      document.getElementById('quiz-feedback').innerHTML = `<p class="success">${q.feedback}</p>`;
+    } else {
+      btn.classList.add('incorrect');
+      document.querySelectorAll('.quiz-option')[q.correct].classList.add('correct');
+      document.getElementById('quiz-feedback').innerHTML = `<p class="error">❌ Incorrecto. ${q.feedback}</p>`;
+    }
+    document.getElementById('quiz-feedback').style.display = 'block';
+    document.getElementById('quiz-next').style.display = 'block';
+  }
+  function nextQuestion() {
+    qIndex = (qIndex + 1) % quizData.length;
+    loadQuiz();
+  }
+  loadQuiz();
+</script>
+</body>
+</html>
