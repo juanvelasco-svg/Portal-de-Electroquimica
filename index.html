@@ -69,6 +69,7 @@
   <button onclick="showSection('redox')">🔄 Balanceo REDOX</button>
   <button onclick="showSection('quiz')">📝 Quiz Interactivo</button>
   <button onclick="showSection('tips')">💡 Desconfusiones</button>
+  <button onclick="showSection('generador')">🎲 Generador Aleatorio</button>
 </nav>
 
 <main>
@@ -174,6 +175,57 @@
         <h3>🌉 Puente Salino</h3>
         <p>Aniones migran al <strong>ánodo</strong> (compensa carga + por oxidación). Cationes migran al <strong>cátodo</strong> (compensa carga - por reducción).</p>
       </div>
+    </div>
+  </section>
+    <!-- SECCIÓN 6: GENERADOR Y MAPA MENTAL -->
+  <section id="generador">
+    
+    <!-- SUB-MÓDULO: MAPA MENTAL -->
+    <div class="card">
+      <h2>🗺️ Mapa Mental: Tipos de Celdas</h2>
+      <p style="margin-bottom:1rem;">Visualiza la lógica de decisión entre celdas Galvánicas y Electrolíticas.</p>
+      <div class="mermaid" style="text-align:center; overflow-x:auto;">
+        graph TD
+        A[Inicio: Observo el Sistema] --> B{¿Hay Fuente Externa<br>Batería/Generador?}
+        B -- NO --> C[Celda GALVÁNICA]
+        C --> D[Espontánea E° > 0]
+        D --> E[Química → Electricidad]
+        E --> F[Ánodo: Negativo -<br>Oxidación]
+        E --> G[Cátodo: Positivo +<br>Reducción]
+        B -- SÍ --> H[Celda ELECTROLÍTICA]
+        H --> I[No Espontánea E° < 0]
+        I --> J[Electricidad → Química]
+        J --> K[Ánodo: Positivo +<br>Oxidación]
+        J --> L[Cátodo: Negativo -<br>Reducción]
+        style C fill:#d1fae5,stroke:#059669,stroke-width:2px
+        style H fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+      </div>
+    </div>
+
+    <!-- SUB-MÓDULO: GENERADOR DE EJERCICIOS -->
+    <div class="card">
+      <h2>🎲 Generador de Práctica Aleatoria</h2>
+      <p>El sistema crea un ejercicio nuevo cada vez. Resuelve paso a paso para validar tu razonamiento.</p>
+      
+      <div class="form-group">
+        <label>Tipo de Ejercicio:</label>
+        <select id="gen-type" onchange="generateExercise()">
+          <option value="cell">Cálculo de Potencial (E°celda)</option>
+          <option value="faraday">Ley de Faraday (Masa/Tiempo)</option>
+        </select>
+      </div>
+
+      <div id="exercise-area" style="background:#f8fafc; padding:1.5rem; border-radius:8px; border:1px solid #e2e8f0;">
+        <p id="gen-question" style="font-weight:600; font-size:1.1rem; margin-bottom:1rem;"></p>
+        
+        <!-- Inputs dinámicos según el tipo de ejercicio -->
+        <div id="gen-inputs"></div>
+        
+        <button class="calc" onclick="checkGeneratedExercise()" style="margin-top:1rem;">Validar Respuesta</button>
+        <div id="gen-feedback" class="step-box" style="display:none; margin-top:1rem;"></div>
+      </div>
+      
+      <button onclick="generateExercise()" style="background:white; border:1px solid var(--primary); color:var(--primary); padding:0.5rem 1rem; border-radius:6px; cursor:pointer; margin-top:1rem; font-weight:500;">🔄 Generar Nuevo Ejercicio</button>
     </div>
   </section>
 </main>
@@ -439,6 +491,122 @@
     loadQuiz();
   }
   loadQuiz();
+    // --- LIBRERÍA MERMAID PARA EL MAPA MENTAL ---
+  // Se inicializa al cargar la página
+  document.addEventListener('DOMContentLoaded', function() {
+    if(window.mermaid) {
+      mermaid.initialize({ startOnLoad: true });
+    }
+  });
+
+  // --- BASE DE DATOS QUÍMICA (De tus PDFs) ---
+  const redoxPairs = [
+    { name: "Zn²⁺/Zn", E: -0.76, n: 2, M: 65.38 },
+    { name: "Cu²⁺/Cu", E: 0.34, n: 2, M: 63.55 },
+    { name: "Ag⁺/Ag", E: 0.80, n: 1, M: 107.87 },
+    { name: "Ni²⁺/Ni", E: -0.25, n: 2, M: 58.69 },
+    { name: "Cr³⁺/Cr", E: -0.74, n: 3, M: 52.00 },
+    { name: "Al³⁺/Al", E: -1.66, n: 3, M: 26.98 }
+  ];
+
+  let currentExercise = {}; // Almacena el ejercicio actual para validación
+
+  // --- GENERADOR DE EJERCICIOS ---
+  function generateExercise() {
+    const type = document.getElementById('gen-type').value;
+    const area = document.getElementById('gen-inputs');
+    const qEl = document.getElementById('gen-question');
+    document.getElementById('gen-feedback').style.display = 'none';
+
+    if (type === 'cell') {
+      // Lógica para Potencial de Celda
+      const idx1 = Math.floor(Math.random() * redoxPairs.length);
+      let idx2 = Math.floor(Math.random() * redoxPairs.length);
+      while(idx1 === idx2) idx2 = Math.floor(Math.random() * redoxPairs.length);
+      
+      const p1 = redoxPairs[idx1];
+      const p2 = redoxPairs[idx2];
+      
+      // Determinar espontaneidad (el mayor E es cátodo)
+      const cathode = p1.E > p2.E ? p1 : p2;
+      const anode = p1.E > p2.E ? p2 : p1;
+      const eCell = (cathode.E - anode.E).toFixed(2);
+
+      currentExercise = {
+        type: 'cell',
+        answer: parseFloat(eCell),
+        anode: anode.name,
+        cathode: cathode.name,
+        steps: `1. Cátodo (Mayor E°): ${cathode.name} (${cathode.E} V)\n2. Ánodo (Menor E°): ${anode.name} (${anode.E} V)\n3. E°celda = ${cathode.E} - (${anode.E}) = ${eCell} V`
+      };
+
+      qEl.innerHTML = `Calcule el E°celda para una celda formada por los pares: <br> <span class="highlight">${p1.name}</span> y <span class="highlight">${p2.name}</span>`;
+      
+      area.innerHTML = `
+        <div class="grid-2">
+          <div class="form-group"><label>E°celda calculado (V):</label><input type="number" id="ans-cell" step="0.01"></div>
+          <div class="form-group"><label>¿Quién es el Ánodo?</label><select id="sel-anode"><option value="">Seleccione...</option><option value="${p1.name}">${p1.name}</option><option value="${p2.name}">${p2.name}</option></select></div>
+        </div>
+      `;
+
+    } else {
+      // Lógica para Faraday (Ejemplo: Depositar Metal)
+      const metal = redoxPairs[Math.floor(Math.random() * redoxPairs.length)];
+      const I = (Math.random() * 10 + 1).toFixed(1); // 1 a 11 A
+      const t = Math.floor(Math.random() * 3000 + 1000); // 1000 a 4000 s
+      
+      // m = (I * t * M) / (n * F)
+      const mass = ((I * t * metal.M) / (metal.n * 96485)).toFixed(3);
+
+      currentExercise = {
+        type: 'faraday',
+        answer: parseFloat(mass),
+        steps: `1. Q = I × t = ${I} A × ${t} s = ${(I*t).toFixed(0)} C\n2. moles e- = Q / 96485 = ${((I*t)/96485).toFixed(4)} mol\n3. Masa = moles e- × (M/${metal.n}) = ${mass} g`
+      };
+
+      qEl.innerHTML = `En la electrólisis de una solución de <span class="highlight">${metal.name}</span>, se aplica una corriente de <strong>${I} A</strong> durante <strong>${t} segundos</strong>. ¿Qué masa de metal se deposita?`;
+      
+      area.innerHTML = `
+        <div class="form-group"><label>Masa depositada (g):</label><input type="number" id="ans-faraday" step="0.001"></div>
+      `;
+    }
+  }
+
+  function checkGeneratedExercise() {
+    const fb = document.getElementById('gen-feedback');
+    let isCorrect = false;
+    let msg = "";
+
+    if (currentExercise.type === 'cell') {
+      const val = parseFloat(document.getElementById('ans-cell').value);
+      const anodeSel = document.getElementById('sel-anode').value;
+      
+      if (Math.abs(val - currentExercise.answer) < 0.05 && anodeSel === currentExercise.anode) {
+        isCorrect = true;
+        msg = `✅ ¡Excelente! Identificaste correctamente el ánodo (${currentExercise.anode}) y el potencial.`;
+      } else {
+        msg = `❌ Revisa tus pasos. <br>💡 Pista: El ánodo es siempre el par con el menor E° de reducción.`;
+      }
+    } else {
+      const val = parseFloat(document.getElementById('ans-faraday').value);
+      if (Math.abs(val - currentExercise.answer) < 0.1) { // Margen de error pequeño
+        isCorrect = true;
+        msg = `✅ ¡Correcto! Cálculo preciso de la masa.`;
+      } else {
+        msg = `❌ Resultado incorrecto. Verifica la fórmula m = (I·t·M)/(n·F).`;
+      }
+    }
+
+    fb.innerHTML = `
+      <p class="${isCorrect ? 'success' : 'error'}">${msg}</p>
+      <hr style="margin:0.5rem 0; border:none; border-top:1px dashed #cbd5e1;">
+      <p style="font-size:0.9rem; white-space:pre-line;"><strong>Solución Paso a Paso:</strong><br>${currentExercise.steps}</p>
+    `;
+    fb.style.display = 'block';
+  }
+
+  // Inicializar primer ejercicio al cargar
+  generateExercise();
 </script>
 </body>
 </html>
