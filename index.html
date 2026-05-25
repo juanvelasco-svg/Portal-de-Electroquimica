@@ -54,6 +54,63 @@
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
     footer { text-align: center; padding: 2rem 1rem; color: var(--text-light); font-size: 0.9rem; border-top: 1px solid var(--border); margin-top: 2rem; }
     @media (max-width: 600px) { nav { gap: 0.3rem; } nav button { font-size: 0.85rem; padding: 0.5rem 0.8rem; } }
+        /* ESTILOS DEL MAPA MENTAL INTERACTIVO */
+    .mind-map-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem 0;
+      position: relative;
+    }
+    .node {
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      font-weight: 600;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      z-index: 2;
+    }
+    .node.central { background: var(--primary); color: white; font-size: 1.2rem; width: 200px; }
+    .node.galvani { background: #d1fae5; color: #065f46; border: 2px solid #10b981; }
+    .node.electro { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+    .node.process { background: #fef3c7; color: #92400e; border: 2px solid #f59e0b; }
+    .node.small { font-size: 0.9rem; padding: 0.5rem 1rem; background: white; border: 1px solid #cbd5e1; }
+    
+    /* Efecto Hover para mostrar detalles */
+    .branch { position: relative; width: 100%; display: flex; justify-content: center; }
+    .details { 
+      display: none; 
+      position: absolute; 
+      top: 100%; 
+      left: 50%; 
+      transform: translateX(-50%); 
+      background: white; 
+      padding: 1rem; 
+      border-radius: 8px; 
+      box-shadow: 0 10px 15px rgba(0,0,0,0.1); 
+      width: 220px; 
+      text-align: left; 
+      font-size: 0.9rem; 
+      z-index: 10; 
+      border: 1px solid var(--border);
+    }
+    .details ul { padding-left: 1.2rem; margin: 0; }
+    .details li { margin-bottom: 0.5rem; }
+    
+    .branch:hover .details { display: block; animation: fadeIn 0.3s; }
+    .node:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.15); }
+    
+    .bridge { display: flex; gap: 2rem; align-items: flex-start; margin-top: 1rem; }
+    .sub-branch { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    
+    @media (max-width: 600px) {
+      .mind-map-container { gap: 1rem; }
+      .bridge { flex-direction: column; align-items: center; }
+    }
   </style>
 </head>
 <body>
@@ -177,35 +234,62 @@
       </div>
     </div>
   </section>
-    <!-- SECCIÓN 6: GENERADOR Y MAPA MENTAL -->
+   <!-- SECCIÓN 6: MAPA MENTAL VISUAL Y GENERADOR -->
   <section id="generador">
     
-    <!-- SUB-MÓDULO: MAPA MENTAL -->
+    <!-- SUB-MÓDULO: MAPA MENTAL INTERACTIVO (VISUAL) -->
     <div class="card">
-      <h2>🗺️ Mapa Mental: Tipos de Celdas</h2>
-      <p style="margin-bottom:1rem;">Visualiza la lógica de decisión entre celdas Galvánicas y Electrolíticas.</p>
-      <div class="mermaid" style="text-align:center; overflow-x:auto;">
-        graph TD
-        A[Inicio: Observo el Sistema] --> B{¿Hay Fuente Externa<br>Batería/Generador?}
-        B -- NO --> C[Celda GALVÁNICA]
-        C --> D[Espontánea E° > 0]
-        D --> E[Química → Electricidad]
-        E --> F[Ánodo: Negativo -<br>Oxidación]
-        E --> G[Cátodo: Positivo +<br>Reducción]
-        B -- SÍ --> H[Celda ELECTROLÍTICA]
-        H --> I[No Espontánea E° < 0]
-        I --> J[Electricidad → Química]
-        J --> K[Ánodo: Positivo +<br>Oxidación]
-        J --> L[Cátodo: Negativo -<br>Reducción]
-        style C fill:#d1fae5,stroke:#059669,stroke-width:2px
-        style H fill:#fee2e2,stroke:#dc2626,stroke-width:2px
+      <h2>🗺️ Mapa Conceptual: Electroquímica</h2>
+      <p style="margin-bottom:1rem;">Pasa el mouse sobre los conceptos clave para ver los detalles.</p>
+      
+      <div class="mind-map-container">
+        <!-- Nodo Central -->
+        <div class="node central">Electroquímica<br><small>Interconversión Energía</small></div>
+        
+        <!-- Ramas -->
+        <div class="branch left">
+          <div class="node galvani">Celda Galvánica<br><small>(Voltaica)</small></div>
+          <div class="details galvani-details">
+            <ul>
+              <li>⚡ <strong>Espontánea</strong> (E° > 0)</li>
+              <li>🔋 Genera Electricidad</li>
+              <li>➖ Ánodo: Negativo</li>
+              <li>➕ Cátodo: Positivo</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="branch right">
+          <div class="node electro">Celda Electrolítica</div>
+          <div class="details electro-details">
+            <ul>
+              <li>🛑 <strong>No Espontánea</strong> (E° < 0)</li>
+              <li>🔌 Consume Electricidad</li>
+              <li>➕ Ánodo: Positivo</li>
+              <li>➖ Cátodo: Negativo</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Conexiones inferiores -->
+        <div class="bridge">
+          <div class="node process">Procesos</div>
+          <div class="sub-branch">
+            <div class="node small">Oxidación<br><small>Pérdida e-</small></div>
+            <p style="font-size:0.8rem; color:#64748b;">Ocurre en el <strong>ÁNODO</strong><br>(AN OX)</p>
+          </div>
+          <div class="sub-branch">
+            <div class="node small">Reducción<br><small>Ganancia e-</small></div>
+            <p style="font-size:0.8rem; color:#64748b;">Ocurre en el <strong>CÁTODO</strong><br>(RED CAT)</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- SUB-MÓDULO: GENERADOR DE EJERCICIOS -->
+    <!-- SUB-MÓDULO: GENERADOR DE EJERCICIOS (El mismo de antes) -->
     <div class="card">
       <h2>🎲 Generador de Práctica Aleatoria</h2>
-      <p>El sistema crea un ejercicio nuevo cada vez. Resuelve paso a paso para validar tu razonamiento.</p>
+      <p>El sistema crea un ejercicio nuevo cada vez. Resuelve paso a paso.</p>
       
       <div class="form-group">
         <label>Tipo de Ejercicio:</label>
@@ -217,17 +301,14 @@
 
       <div id="exercise-area" style="background:#f8fafc; padding:1.5rem; border-radius:8px; border:1px solid #e2e8f0;">
         <p id="gen-question" style="font-weight:600; font-size:1.1rem; margin-bottom:1rem;"></p>
-        
-        <!-- Inputs dinámicos según el tipo de ejercicio -->
         <div id="gen-inputs"></div>
-        
         <button class="calc" onclick="checkGeneratedExercise()" style="margin-top:1rem;">Validar Respuesta</button>
         <div id="gen-feedback" class="step-box" style="display:none; margin-top:1rem;"></div>
       </div>
       
       <button onclick="generateExercise()" style="background:white; border:1px solid var(--primary); color:var(--primary); padding:0.5rem 1rem; border-radius:6px; cursor:pointer; margin-top:1rem; font-weight:500;">🔄 Generar Nuevo Ejercicio</button>
     </div>
-  </section>
+  </section> 
 </main>
 
 <footer>
