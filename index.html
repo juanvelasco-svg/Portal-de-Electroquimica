@@ -274,12 +274,134 @@
   }
 
   // 4. QUIZ ENGINE
-  const quizData = [
-    { q: "En una celda electrolítica, el ánodo tiene signo ______ y allí ocurre ______.", opts: ["Positivo / Oxidación", "Negativo / Reducción", "Positivo / Reducción", "Negativo / Oxidación"], correct: 0, feedback: "✅ Correcto. En electrolítica el ánodo es (+) conectado al polo positivo de la fuente, y siempre ocurre OXIDACIÓN." },
-    { q: "¿Qué iones del puente salino migran hacia el cátodo?", opts: ["Aniones (−)", "Cationes (+)", "Electrones (e⁻)", "Moléculas de agua"], correct: 1, feedback: "✅ Correcto. Los cationes migran al cátodo para compensar la carga negativa generada por la reducción." },
-    { q: "Si E°celda = −0.45 V, la reacción es:", opts: ["Espontánea", "No espontánea", "En equilibrio", "Exotérmica siempre"], correct: 1, feedback: "✅ Correcto. E° < 0 indica que la reacción directa no es espontánea. Se requiere energía externa (electrólisis)." },
-    { q: "Al balancear REDOX en medio básico, después de usar H⁺ y H₂O, ¿qué se hace?", opts: ["Se dejan los H⁺ tal cual", "Se agregan OH⁻ a ambos lados para neutralizar H⁺", "Se multiplica todo por −1", "Se elimina el H₂O"], correct: 1, feedback: "✅ Correcto. Se añaden OH⁻ equivalentes a los H⁺, se forma H₂O y se simplifica." },
-    { q: "Para calcular E°celda, si se multiplica una semirreacción por 2 para balancear e⁻, el potencial E°:", opts: ["Se duplica", "Se mantiene igual", "Se eleva al cuadrado", "Se divide por 2"], correct: 1, feedback: "✅ Correcto. E° es una propiedad intensiva. No se multiplica por coeficientes estequiométricos." }
+    const quizData = [
+    // --- MÓDULO 1: CONCEPTOS BÁSICOS Y TERMINOLOGÍA ---
+    { 
+      q: "¿Qué proceso ocurre SIEMPRE en el Ánodo, sin importar si es celda Galvánica o Electrolítica?", 
+      opts: ["Reducción", "Oxidación", "Ganancia de electrones", "Disminución del estado de oxidación"], 
+      correct: 1, 
+      feedback: "✅ Correcto. Recuerda la regla mnemotécnica 'AN OX': Ánodo = Oxidación." 
+    },
+    { 
+      q: "En una Celda Galvánica (Voltaica), el signo del Cátodo es:", 
+      opts: ["Positivo (+)", "Negativo (-)", "Neutro", "Variable según la reacción"], 
+      correct: 0, 
+      feedback: "✅ Correcto. En galvánicas, el cátodo atrae electrones del circuito externo, por lo que es el polo positivo." 
+    },
+    { 
+      q: "El Agente Oxidante es la especie química que:", 
+      opts: ["Se oxida y pierde electrones", "Se reduce y gana electrones", "Aumenta su número de oxidación", "Cede protones al medio"], 
+      correct: 1, 
+      feedback: "✅ Correcto. El agente oxidante causa la oxidación en otro porque él mismo se reduce (gana e-)." 
+    },
+    { 
+      q: "¿Cuál es la función principal del Puente Salino en una celda electroquímica?", 
+      opts: ["Generar electrones nuevos", "Mezclar las soluciones para acelerar la reacción", "Mantener la neutralidad eléctrica permitiendo el flujo de iones", "Medir el voltaje de la celda"], 
+      correct: 2, 
+      feedback: "✅ Correcto. Sin puente salino, se acumularía carga y la reacción se detendría inmediatamente." 
+    },
+    { 
+      q: "En una Celda Electrolítica, los electrones fluyen desde la fuente de poder externa hacia el:", 
+      opts: ["Ánodo (+)", "Cátodo (-)", "Puente salino", "Voltímetro"], 
+      correct: 1, 
+      feedback: "✅ Correcto. La fuente 'empuja' electrones hacia el cátodo, obligándolo a ser negativo y provocar reducción." 
+    },
+
+    // --- MÓDULO 2: BALANCEO REDOX (MEDIO ÁCIDO/BÁSICO) ---
+    { 
+      q: "Al balancear una ecuación en medio ácido, ¿qué especie química se utiliza para balancear los átomos de Oxígeno?", 
+      opts: ["O₂ gas", "Iones OH⁻", "Moléculas de H₂O", "Peróxido de hidrógeno"], 
+      correct: 2, 
+      feedback: "✅ Correcto. Se agrega H₂O donde falta oxígeno y luego H⁺ para balancear los hidrógenos." 
+    },
+    { 
+      q: "En la semirreacción de reducción: MnO₄⁻ → Mn²⁺ (en medio ácido), ¿cuántos electrones se ganan?", 
+      opts: ["2 e⁻", "3 e⁻", "5 e⁻", "7 e⁻"], 
+      correct: 2, 
+      feedback: "✅ Correcto. El Manganeso pasa de estado de oxidación +7 a +2, ganando 5 electrones." 
+    },
+    { 
+      q: "Para convertir una ecuación balanceada en medio ácido a medio básico, el paso final consiste en:", 
+      opts: ["Eliminar todos los H⁺", "Agregar OH⁻ a ambos lados para neutralizar los H⁺ formando H₂O", "Multiplicar toda la ecuación por -1", "Agregar más H₂O a los productos"], 
+      correct: 1, 
+      feedback: "✅ Correcto. H⁺ + OH⁻ → H₂O. Luego se simplifican las moléculas de agua excedentes." 
+    },
+    { 
+      q: "En la reacción global balanceada: Cr₂O₇²⁻ + 6Fe²⁺ + 14H⁺ → 2Cr³⁺ + 6Fe³⁺ + 7H₂O, ¿por qué el Fe³⁺ tiene coeficiente 6?", 
+      opts: ["Porque hay 6 oxígenos", "Para igualar la carga total", "Para igualar los 6 electrones transferidos del Cr", "Es un error de tanteo"], 
+      correct: 2, 
+      feedback: "✅ Correcto. El Cromo gana 6e⁻ en total (2 átomos x 3e⁻), por lo que el Hierro debe perder 6e⁻ (6 átomos x 1e⁻)." 
+    },
+    { 
+      q: "Si al finalizar un balanceo en medio básico te quedan iones H⁺ en la ecuación, significa que:", 
+      opts: ["El resultado es correcto", "Falta neutralizar con OH⁻ y simplificar el agua", "Debes cambiar a medio ácido", "La reacción no es posible termodinámicamente"], 
+      correct: 1, 
+      feedback: "✅ Correcto. En medio básico no pueden existir H⁺ libres; deben convertirse en agua." 
+    },
+
+    // --- MÓDULO 3: POTENCIALES Y ESPONTANEIDAD ---
+    { 
+      q: "Si el potencial estándar de celda (E°celda) es positivo (+), la reacción se considera:", 
+      opts: ["No espontánea", "Espontánea", "En equilibrio químico", "Endotérmica siempre"], 
+      correct: 1, 
+      feedback: "✅ Correcto. E° > 0 indica que la reacción libera energía libre de Gibbs (espontánea)." 
+    },
+    { 
+      q: "¿Por qué NO se multiplica el valor del potencial estándar (E°) por los coeficientes estequiométricos al balancear?", 
+      opts: ["Porque es un error matemático común", "Porque el potencial es una propiedad intensiva (no depende de la cantidad)", "Porque los electrones no tienen masa", "Solo se multiplica en medio básico"], 
+      correct: 1, 
+      feedback: "✅ Correcto. El voltaje es como la 'presión' eléctrica; no aumenta si duplicas la cantidad de materia." 
+    },
+    { 
+      q: "Dados: Zn²⁺/Zn (-0.76 V) y Cu²⁺/Cu (+0.34 V). ¿Cuál es el E°celda de la pila Daniell?", 
+      opts: ["-1.10 V", "+0.42 V", "+1.10 V", "-0.42 V"], 
+      correct: 2, 
+      feedback: "✅ Correcto. E°celda = E°cátodo (0.34) - E°ánodo (-0.76) = 1.10 V." 
+    },
+    { 
+      q: "Por convención internacional, el potencial del Electrodo Estándar de Hidrógeno (EEH) es:", 
+      opts: ["1.00 V", "-1.00 V", "0.00 V", "96485 V"], 
+      correct: 2, 
+      feedback: "✅ Correcto. Es el punto de referencia arbitrario contra el cual se miden todos los demás." 
+    },
+    { 
+      q: "Si E°(Ag⁺/Ag) = +0.80 V y E°(Ni²⁺/Ni) = -0.25 V. ¿Quién actúa como Ánodo en una celda galvánica?", 
+      opts: ["La plata (Ag)", "El ion plata (Ag⁺)", "El níquel metálico (Ni)", "El ion níquel (Ni²⁺)"], 
+      correct: 2, 
+      feedback: "✅ Correcto. El Ni tiene menor potencial de reducción, por lo tanto, tiende a oxidarse (ser ánodo)." 
+    },
+
+    // --- MÓDULO 4: CELDAS GALVÁNICAS VS ELECTROLÍTICAS Y FARADAY ---
+    { 
+      q: "En la electrólisis del NaCl fundido (Celda de Downs), ¿qué producto se obtiene en el Ánodo?", 
+      opts: ["Sodio líquido (Na)", "Gas Cloro (Cl₂)", "Gas Hidrógeno (H₂)", "Hidróxido de sodio (NaOH)"], 
+      correct: 1, 
+      feedback: "✅ Correcto. En el ánodo ocurre oxidación: 2Cl⁻ → Cl₂(g) + 2e⁻." 
+    },
+    { 
+      q: "La Constante de Faraday (F ≈ 96485 C/mol) representa físicamente:", 
+      opts: ["La masa de 1 mol de electrones", "La carga eléctrica total de 1 mol de electrones", "El voltaje máximo de una celda", "La corriente máxima soportada"], 
+      correct: 1, 
+      feedback: "✅ Correcto. Relaciona la escala microscópica (electrones) con la macroscópica (Coulombs)." 
+    },
+    { 
+      q: "Para depositar 1 mol de Aluminio metálico (Al³⁺ + 3e⁻ → Al), se requieren teóricamente:", 
+      opts: ["1 Faraday", "2 Faradays", "3 Faradays", "27 Faradays"], 
+      correct: 2, 
+      feedback: "✅ Correcto. Cada ion Al³⁺ necesita 3 electrones, por lo que 1 mol de Al necesita 3 moles de e⁻." 
+    },
+    { 
+      q: "En una celda Galvánica, los aniones (iones negativos) del puente salino migran hacia el:", 
+      opts: ["Cátodo", "Ánodo", "Voltímetro", "Exterior de la celda"], 
+      correct: 1, 
+      feedback: "✅ Correcto. Migran al ánodo para compensar el exceso de cationes positivos (ej. Zn²⁺) que se están generando." 
+    },
+    { 
+      q: "Si aplicas una corriente de 2 Amperios durante 10 segundos, la carga total (Q) que ha pasado es:", 
+      opts: ["5 Coulombs", "20 Coulombs", "0.2 Coulombs", "96485 Coulombs"], 
+      correct: 1, 
+      feedback: "✅ Correcto. Q = I × t = 2 A × 10 s = 20 C." 
+    }
   ];
   let qIndex = 0;
   function loadQuiz() {
