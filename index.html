@@ -54,17 +54,17 @@
     .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
     footer { text-align: center; padding: 2rem 1rem; color: var(--text-light); font-size: 0.9rem; border-top: 1px solid var(--border); margin-top: 2rem; }
     @media (max-width: 600px) { nav { gap: 0.3rem; } nav button { font-size: 0.85rem; padding: 0.5rem 0.8rem; } }
-        /* ESTILOS DEL MAPA MENTAL INTERACTIVO */
+    /* ESTILOS DEL MAPA MENTAL INTERACTIVO MEJORADO */
     .mind-map-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 2rem;
+      gap: 2.5rem; /* Más espacio entre niveles */
       padding: 2rem 0;
       position: relative;
     }
     .node {
-      padding: 1rem 1.5rem;
+      padding: 1.2rem 1.8rem; /* Nodos principales más grandes */
       border-radius: 12px;
       font-weight: 600;
       text-align: center;
@@ -73,43 +73,47 @@
       cursor: pointer;
       position: relative;
       z-index: 2;
+      font-size: 1rem;
     }
-    .node.central { background: var(--primary); color: white; font-size: 1.2rem; width: 200px; }
-    .node.galvani { background: #d1fae5; color: #065f46; border: 2px solid #10b981; }
-    .node.electro { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; }
+    .node.central { background: var(--primary); color: white; font-size: 1.3rem; width: 220px; }
+    .node.galvani { background: #d1fae5; color: #065f46; border: 2px solid #10b981; min-width: 180px; }
+    .node.electro { background: #fee2e2; color: #991b1b; border: 2px solid #ef4444; min-width: 180px; }
     .node.process { background: #fef3c7; color: #92400e; border: 2px solid #f59e0b; }
-    .node.small { font-size: 0.9rem; padding: 0.5rem 1rem; background: white; border: 1px solid #cbd5e1; }
+    .node.small { font-size: 0.9rem; padding: 0.6rem 1.2rem; background: white; border: 1px solid #cbd5e1; }
     
-    /* Efecto Hover para mostrar detalles */
+    /* TARJETAS DE INFORMACIÓN (TOOLTIPS) AMPLIADAS */
     .branch { position: relative; width: 100%; display: flex; justify-content: center; }
     .details { 
       display: none; 
       position: absolute; 
-      top: 100%; 
+      top: 110%; /* Un poco más separado del nodo */
       left: 50%; 
       transform: translateX(-50%); 
       background: white; 
-      padding: 1rem; 
-      border-radius: 8px; 
-      box-shadow: 0 10px 15px rgba(0,0,0,0.1); 
-      width: 220px; 
+      padding: 1.5rem; /* Más relleno interno */
+      border-radius: 12px; 
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15); /* Sombra más suave y profunda */
+      width: 280px; /* ANCHO AUMENTADO de 220px a 280px */
+      max-width: 90vw; /* Para que no se salga en móviles */
       text-align: left; 
-      font-size: 0.9rem; 
+      font-size: 0.95rem; /* Letra un poco más grande */
       z-index: 10; 
       border: 1px solid var(--border);
+      line-height: 1.6; /* Mejor espaciado entre líneas */
     }
     .details ul { padding-left: 1.2rem; margin: 0; }
-    .details li { margin-bottom: 0.5rem; }
+    .details li { margin-bottom: 0.8rem; } /* Más espacio entre items de la lista */
     
     .branch:hover .details { display: block; animation: fadeIn 0.3s; }
-    .node:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.15); }
+    .node:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
     
-    .bridge { display: flex; gap: 2rem; align-items: flex-start; margin-top: 1rem; }
-    .sub-branch { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .bridge { display: flex; gap: 3rem; align-items: flex-start; margin-top: 1rem; }
+    .sub-branch { display: flex; flex-direction: column; align-items: center; gap: 0.8rem; }
     
     @media (max-width: 600px) {
-      .mind-map-container { gap: 1rem; }
-      .bridge { flex-direction: column; align-items: center; }
+      .mind-map-container { gap: 1.5rem; }
+      .bridge { flex-direction: column; align-items: center; gap: 1.5rem; }
+      .details { width: 90%; position: static; transform: none; margin-top: 0.5rem; }
     }
   </style>
 </head>
@@ -246,15 +250,27 @@
         <!-- Nodo Central -->
         <div class="node central">Electroquímica<br><small>Interconversión Energía</small></div>
         
-        <!-- Ramas -->
+               <!-- Ramas -->
         <div class="branch left">
           <div class="node galvani">Celda Galvánica<br><small>(Voltaica)</small></div>
           <div class="details galvani-details">
             <ul>
-              <li>⚡ <strong>Espontánea</strong> (E° > 0)</li>
-              <li>🔋 Genera Electricidad</li>
-              <li>➖ Ánodo: Negativo</li>
-              <li>➕ Cátodo: Positivo</li>
+              <li>⚡ <strong>Espontánea</strong> (E° > 0)<br>La reacción ocurre por sí sola.</li>
+              <li>🔋 <strong>Genera</strong> Energía Eléctrica</li>
+              <li>➖ <strong>Ánodo:</strong> Negativo (Oxidación)</li>
+              <li>➕ <strong>Cátodo:</strong> Positivo (Reducción)</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="branch right">
+          <div class="node electro">Celda Electrolítica</div>
+          <div class="details electro-details">
+            <ul>
+              <li>🛑 <strong>No Espontánea</strong> (E° < 0)<br>Requiere energía externa.</li>
+              <li>🔌 <strong>Consume</strong> Energía Eléctrica</li>
+              <li>➕ <strong>Ánodo:</strong> Positivo (Oxidación)</li>
+              <li>➖ <strong>Cátodo:</strong> Negativo (Reducción)</li>
             </ul>
           </div>
         </div>
